@@ -1,7 +1,7 @@
 import { BotFrameworkAdapter } from 'botbuilder';
 import express from 'express';
 import { QnAMaker } from 'botbuilder-ai';
-import { ConfBot } from './src/bot';
+import { AbcBot } from './src/bot';
 import config from './apiConfig.json';
 import {sqlQuery} from './src/queryExecutor';
 
@@ -18,7 +18,7 @@ var qnaMaker = new QnAMaker({
     host: config.qna.HOST
 });
 
-const bot = new ConfBot(qnaMaker);
+const bot = new AbcBot(qnaMaker);
 
 app.post('/api/messages', (req, res) => {
     adapter.processActivity(req, res, async (context) => {

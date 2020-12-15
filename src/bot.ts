@@ -4,7 +4,7 @@ import { DialogContext, DialogSet, DialogTurnStatus } from "botbuilder-dialogs";
 import { BotActions } from "./botActions";
 import { SuggestedActionsBot } from "./SuggestedActionsBot";
 
-export class ConfBot extends ActivityHandler {
+export class AbcBot extends ActivityHandler {
     private suggestedBotActions: SuggestedActionsBot;
     private botActions: BotActions;
     private conversationState: ConversationState;
