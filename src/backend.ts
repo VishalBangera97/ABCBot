@@ -1,8 +1,8 @@
 import axios from 'axios';
-import  apiConfig from '../apiConfig.json';
+import apiConfig from '../apiConfig.json';
 
 export class BackEndFunctions {
-    
+
     async client() {
         return await axios.get(apiConfig.endpoints.baseUrl + 'GetClientByClientId');
     }
@@ -11,15 +11,11 @@ export class BackEndFunctions {
         return await axios.get(apiConfig.endpoints.baseUrl + 'GetAccountsByClientId/active');
     }
 
-    async account(accountNumber: string) {
-        return await axios.get(apiConfig.endpoints.baseUrl + 'GetAccountByAccountNumber/' + accountNumber);
-    }
-
     async lastTransactions(accountType: string) {
         return await axios.get(apiConfig.endpoints.baseUrl + 'GetLastTenTransactions/' + accountType);
     }
 
-    async setClientId(token:string) {
+    async setClientId(token: string) {
         return await axios.put(apiConfig.endpoints.baseUrl + 'SetClientId/' + token);
     }
 
@@ -27,8 +23,8 @@ export class BackEndFunctions {
         return await axios.delete(apiConfig.endpoints.baseUrl + 'ClearClientId');
     }
 
-    async getAllAccountStatusByClientId(){
-        return await axios.get(apiConfig.endpoints.baseUrl+'GetAllAccountStatusByClientId');
+    async getAllAccountStatusByClientId() {
+        return await axios.get(apiConfig.endpoints.baseUrl + 'GetAllAccountStatusByClientId');
     }
 }
 

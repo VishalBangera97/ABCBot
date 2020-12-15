@@ -1,58 +1,20 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.QueryExecutor = void 0;
-const tedious_1 = require("tedious");
-const apiConfig_json_1 = __importDefault(require("../apiConfig.json"));
-class QueryExecutor {
-    constructor() {
-        // Create connection to database
-        this.config = {
-            authentication: {
-                options: {
-                    userName: apiConfig_json_1.default.sql.username,
-                    password: apiConfig_json_1.default.sql.password
-                },
-                type: "default"
-            },
-            server: apiConfig_json_1.default.sql.server,
-            options: {
-                database: apiConfig_json_1.default.sql.database,
-                encrypt: true
-            }
-        };
-        this.connection = new tedious_1.Connection(this.config);
-    }
-    // Attempt to connect and execute queries if connection goes through
-    onConnection(query) {
-        this.connection.on("connect", (err) => {
-            if (err) {
-                console.log('here');
-                console.error(err.message);
-            }
-            else {
-                this.queryDatabase(query);
-            }
-        });
-    }
-    queryDatabase(query) {
-        // Read all rows from table
-        const request = new tedious_1.Request(query, (err, rowCount) => {
-            if (err) {
-                console.error(err.message);
-            }
-            else {
-                console.log(`${rowCount} row(s) returned`);
-            }
-        });
-        request.on("row", (columns) => {
-            columns.forEach((column) => {
-                console.log("%s\t%s", column.metadata.colName, column.value);
-            });
-        });
-        this.connection.execSql(request);
-    }
-}
-exports.QueryExecutor = QueryExecutor;
+exports.sqlQuery = void 0;
+const sql = require('mssql');
+const sqlQuery = (queryString) => __awaiter(void 0, void 0, void 0, function* () {
+    yield sql.connect('mssql://User:User123@User/AbcBank');
+    const result = yield sql.query(queryString);
+    console.log(result);
+    return result;
+});
+exports.sqlQuery = sqlQuery;

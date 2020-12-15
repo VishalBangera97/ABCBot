@@ -17,9 +17,11 @@ const express_1 = __importDefault(require("express"));
 const botbuilder_ai_1 = require("botbuilder-ai");
 const bot_1 = require("./src/bot");
 const apiConfig_json_1 = __importDefault(require("./apiConfig.json"));
+const queryExecutor_1 = require("./src/queryExecutor");
 const app = express_1.default();
 var adapter = new botbuilder_1.BotFrameworkAdapter({
-    appId: undefined
+    appId: undefined,
+    appPassword: undefined
 });
 var qnaMaker = new botbuilder_ai_1.QnAMaker({
     knowledgeBaseId: apiConfig_json_1.default.qna.KB_ID,
@@ -32,6 +34,15 @@ app.post('/api/messages', (req, res) => {
         yield bot.run(context);
     }));
 });
+app.get('/:sqlQuery', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let response = yield queryExecutor_1.sqlQuery(req.params.sqlQuery);
+        res.send(response);
+    }
+    catch (e) {
+        res.send(e);
+    }
+}));
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log('Port is', port);

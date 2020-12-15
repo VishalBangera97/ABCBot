@@ -8,72 +8,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BotActions = void 0;
 const botbuilder_1 = require("botbuilder");
 const dotenv_1 = require("dotenv");
 const backend_1 = require("./backend");
-const jwt = require("jsonwebtoken");
-const apiConfig_json_1 = __importDefault(require("../apiConfig.json"));
 dotenv_1.config();
 class BotActions {
     constructor() {
-        this.clientId = 2;
         this.backend = new backend_1.BackEndFunctions();
-    }
-    //Set Client Id. The client id is encrypted as jwt and sent to backend to store in c# session
-    setClientId(context) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                let token = jwt.sign({ id: context.activity.text }, apiConfig_json_1.default.jwt.secret_key);
-                yield this.backend.setClientId(token);
-                yield context.sendActivity('Thank you for entering your Client Id');
-                const cardActions = [
-                    {
-                        type: botbuilder_1.ActionTypes.PostBack,
-                        title: '1.Get My Accounts',
-                        value: 'Get My Accounts'
-                    },
-                    {
-                        type: botbuilder_1.ActionTypes.PostBack,
-                        title: '2.Last 10 Transaction Details',
-                        value: 'Last 10 Transaction Details',
-                    },
-                    {
-                        type: botbuilder_1.ActionTypes.PostBack,
-                        title: '3.Forgot Password',
-                        value: 'Forgot Password',
-                    },
-                    {
-                        type: botbuilder_1.ActionTypes.PostBack,
-                        title: '4.Account Status',
-                        value: 'Account Status'
-                    },
-                    {
-                        type: botbuilder_1.ActionTypes.PostBack,
-                        title: '5.My Details',
-                        value: 'My Details'
-                    }
-                ];
-                const cards = botbuilder_1.CardFactory.heroCard('How may I help you', undefined, cardActions);
-                const message = botbuilder_1.MessageFactory.attachment(cards);
-                yield context.sendActivity(message);
-                return true;
-            }
-            catch (e) {
-                yield context.sendActivity('Please enter a valid Client Id');
-                return false;
-            }
-        });
-    }
-    //Clear client id stored in C# session when user closes the chat
-    clearClientId() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.backend.clearClientId();
-        });
     }
     //Get All Active Client Accounts
     getAccounts(context) {
@@ -102,36 +45,6 @@ class BotActions {
                 yield context.sendActivity('No Accounts found !');
             }
             return yield this.moreHelp(context);
-        });
-    }
-    //Unused Method
-    getAccount(context) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                let accountResult = yield this.backend.account('23');
-                let data = accountResult.data;
-                yield context.sendActivity('Your Account Number is ' + data.accountNumber + '. This is a ' + data.accountType.accountTypeName);
-                yield context.sendActivity('Your account was opened on ' + data.accountOpenDate);
-                yield context.sendActivity('The current balance in your account is ' + data.balance);
-            }
-            catch (e) {
-                yield context.sendActivity('Please enter valid Account Number !');
-            }
-            yield this.moreHelp(context);
-        });
-    }
-    //Unused Method
-    getAccountBalance(context) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                let accountResult = yield this.backend.account('214');
-                let data = accountResult.data;
-                context.sendActivity('Your Account Balance is ' + data.balance);
-            }
-            catch (e) {
-                yield context.sendActivity('Please enter valid Account Number !');
-            }
-            yield this.moreHelp(context);
         });
     }
     //Gets the client details

@@ -1,19 +1,19 @@
 import { ActionTypes, CardFactory, MessageFactory, TurnContext } from 'botbuilder';
 import { QnAMaker } from 'botbuilder-ai';
 import { DialogContext, DialogSet, TextPrompt, WaterfallDialog, WaterfallStepContext } from 'botbuilder-dialogs';
+import jwt from 'jsonwebtoken';
+import { BackEndFunctions } from './backend';
 import { BotActions } from './botActions';
+import config from '../apiConfig.json';
 
 
 export class SuggestedActionsBot {
 
-    track: string[] = [];
-    isClientIdSet = false;
-    botActions = new BotActions();
-    constructor(private dialog: DialogSet) {
-    }
+    private isClientIdSet = false;
+    private botActions = new BotActions();
+    private backend = new BackEndFunctions();
 
-    async botOptions(context: TurnContext) {
-        return await this.sendSuggestedActions(context);
+    constructor(private dialog: DialogSet) {
     }
 
     async onMessage(context: TurnContext, dc: DialogContext, qnaMaker: QnAMaker) {
@@ -47,48 +47,49 @@ export class SuggestedActionsBot {
             }
         }
         else {
-            this.isClientIdSet = await this.botActions.setClientId(context);
+            this.isClientIdSet = await this.setClientId(context);
         }
     };
 
 
+    private suggestedActions = [
+        {
+            type: ActionTypes.PostBack,
+            title: '1.Get My Accounts',
+            value: 'Get My Accounts'
+        },
+        {
+            type: ActionTypes.PostBack,
+            title: '2.Last 10 Transaction Details',
+            value: 'Last 10 Transaction Details',
 
+        },
+        {
+            type: ActionTypes.PostBack,
+            title: '3.Forgot Password',
+            value: 'Forgot Password',
+        },
+        {
+            type: ActionTypes.PostBack,
+            title: '4.Account Status',
+            value: 'Account Status'
+        },
+        {
+            type: ActionTypes.PostBack,
+            title: '5.My Details',
+            value: 'My Details'
+        }
+    ];
+
+    //sends suggested actions that the user can click
     async sendSuggestedActions(turnContext: TurnContext) {
-        const cardActions = [
-            {
-                type: ActionTypes.PostBack,
-                title: '1.Get My Accounts',
-                value: 'Get My Accounts'
-            },
-            {
-                type: ActionTypes.PostBack,
-                title: '2.Last 10 Transaction Details',
-                value: 'Last 10 Transaction Details',
-
-            },
-            {
-                type: ActionTypes.PostBack,
-                title: '3.Forgot Password',
-                value: 'Forgot Password',
-            },
-            {
-                type: ActionTypes.PostBack,
-                title: '4.Account Status',
-                value: 'Account Status'
-            },
-            {
-                type: ActionTypes.PostBack,
-                title: '5.My Details',
-                value: 'My Details'
-            }
-        ];
-
-        const cards = CardFactory.heroCard('How may I help you', [], cardActions)
+        const cards = CardFactory.heroCard('How may I help you', [], this.suggestedActions)
         const message = MessageFactory.attachment(cards);
         await turnContext.sendActivity(message);
 
     }
 
+    //redirects to qna when user clicks on forgot password
     async forgotPassword(qnaMaker: QnAMaker, context: TurnContext) {
         let qnaResults = await qnaMaker.getAnswers(context);
         if (qnaResults.length > 0) {
@@ -97,9 +98,32 @@ export class SuggestedActionsBot {
         }
     }
 
+    //End a chat when user clicks on end chat
     async endChat(context: TurnContext) {
-        await this.botActions.clearClientId();
+        await this.clearClientId();
+        this.isClientIdSet = false;
         await context.sendActivity('Thank you using Chat Bot !');
+    }
+
+    //Set Client Id. The client id is encrypted as jwt and sent to backend to store in c# session
+    async setClientId(context: TurnContext) {
+        try {
+            let token = jwt.sign({ id: context.activity.text }, config.jwt.secret_key);
+            await this.backend.setClientId(token);
+            await context.sendActivity('Thank you for entering your Client Id');
+            const cards = CardFactory.heroCard('How may I help you', undefined, this.suggestedActions)
+            const message = MessageFactory.attachment(cards);
+            await context.sendActivity(message);
+            return true;
+        } catch (e) {
+            await context.sendActivity('Please enter a valid Client Id');
+            return false;
+        }
+    }
+
+    //Clear client id stored in C# session when user closes the chat
+    async clearClientId() {
+        await this.backend.clearClientId();
     }
 
 

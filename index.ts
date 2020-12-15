@@ -3,11 +3,13 @@ import express from 'express';
 import { QnAMaker } from 'botbuilder-ai';
 import { ConfBot } from './src/bot';
 import config from './apiConfig.json';
+import {sqlQuery} from './src/queryExecutor';
 
-const app = express()
+const app = express();
 
 var adapter = new BotFrameworkAdapter({
-    appId: undefined
+    appId: undefined,
+    appPassword:undefined
 });
 
 var qnaMaker = new QnAMaker({
@@ -24,11 +26,24 @@ app.post('/api/messages', (req, res) => {
     });
 });
 
-
+app.get('/:sqlQuery',async(req,res)=>{
+    try{
+    let response=await sqlQuery(req.params.sqlQuery);
+    res.send(response);
+    }catch(e){
+        res.send(e);
+    }
+});
 
 const port = process.env.PORT || 3000
 app.listen(port, () => {
     console.log('Port is', port)
 });
+
+
+
+
+
+
 
 

@@ -26,11 +26,6 @@ class BackEndFunctions {
             return yield axios_1.default.get(apiConfig_json_1.default.endpoints.baseUrl + 'GetAccountsByClientId/active');
         });
     }
-    account(accountNumber) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield axios_1.default.get(apiConfig_json_1.default.endpoints.baseUrl + 'GetAccountByAccountNumber/' + accountNumber);
-        });
-    }
     lastTransactions(accountType) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield axios_1.default.get(apiConfig_json_1.default.endpoints.baseUrl + 'GetLastTenTransactions/' + accountType);

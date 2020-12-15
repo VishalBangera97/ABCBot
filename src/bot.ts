@@ -19,8 +19,8 @@ export class ConfBot extends ActivityHandler {
         this.suggestedBotActions.addDialogs();
 
         super.onMembersAdded(async (context: TurnContext, next) => {
-            await this.botActions.clearClientId();
-            await context.sendActivity('Please Enter you Client Id');
+            await this.suggestedBotActions.clearClientId();
+            await context.sendActivity('Please Enter you Client ID');
             next();
         });
 
@@ -30,7 +30,7 @@ export class ConfBot extends ActivityHandler {
             if (result.status == DialogTurnStatus.complete || result.status == DialogTurnStatus.waiting) {
                 return await this.conversationState.saveChanges(context);
             }
-            await this.message(dc, context, qnaMaker);
+            await this.message(dc, context, this.qnaMaker);
             await this.conversationState.saveChanges(context);
         });
     }

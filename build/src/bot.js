@@ -24,8 +24,8 @@ class ConfBot extends botbuilder_1.ActivityHandler {
         this.botActions = new botActions_1.BotActions();
         this.suggestedBotActions.addDialogs();
         super.onMembersAdded((context, next) => __awaiter(this, void 0, void 0, function* () {
-            yield this.botActions.clearClientId();
-            yield context.sendActivity('Please Enter you Client Id');
+            yield this.suggestedBotActions.clearClientId();
+            yield context.sendActivity('Please Enter you Client ID');
             next();
         }));
         super.onMessage((context) => __awaiter(this, void 0, void 0, function* () {
@@ -34,7 +34,7 @@ class ConfBot extends botbuilder_1.ActivityHandler {
             if (result.status == botbuilder_dialogs_1.DialogTurnStatus.complete || result.status == botbuilder_dialogs_1.DialogTurnStatus.waiting) {
                 return yield this.conversationState.saveChanges(context);
             }
-            yield this.message(dc, context, qnaMaker);
+            yield this.message(dc, context, this.qnaMaker);
             yield this.conversationState.saveChanges(context);
         }));
     }
