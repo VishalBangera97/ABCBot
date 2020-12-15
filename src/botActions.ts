@@ -79,7 +79,7 @@ export class BotActions {
 
     //Method to ask user if they need more help after every query solution
     async moreHelp(context: TurnContext) {
-        const helps = [
+        const help = [
             {
                 type: ActionTypes.PostBack,
                 title: 'Yes',
@@ -92,7 +92,7 @@ export class BotActions {
             }
         ];
 
-        var reply = MessageFactory.suggestedActions(helps, 'Do you need more help');
+        var reply = MessageFactory.suggestedActions(help, 'Do you need more help');
         await context.sendActivity(reply)
     }
 

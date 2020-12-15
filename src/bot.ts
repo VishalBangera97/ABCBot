@@ -1,12 +1,10 @@
 import { ActivityHandler, ConversationState, MemoryStorage, TurnContext } from "botbuilder";
 import { QnAMaker } from "botbuilder-ai";
 import { DialogContext, DialogSet, DialogTurnStatus } from "botbuilder-dialogs";
-import { BotActions } from "./botActions";
 import { SuggestedActionsBot } from "./SuggestedActionsBot";
 
 export class AbcBot extends ActivityHandler {
     private suggestedBotActions: SuggestedActionsBot;
-    private botActions: BotActions;
     private conversationState: ConversationState;
     private dialog: DialogSet;
 
@@ -15,7 +13,6 @@ export class AbcBot extends ActivityHandler {
         this.conversationState = new ConversationState(new MemoryStorage());
         this.dialog = new DialogSet(this.conversationState.createProperty('dialog'));
         this.suggestedBotActions = new SuggestedActionsBot(this.dialog);
-        this.botActions = new BotActions();
         this.suggestedBotActions.addDialogs();
 
         super.onMembersAdded(async (context: TurnContext, next) => {
